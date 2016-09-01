@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html ng-app="mittens">
+<head>
+  <meta charset="UTF-8">
+  <title>Mittens</title>
+  <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script src="angular.min.js"></script>
+  <script>
+  var app = angular.module('mittens', []);
+
+  app.controller('MittensCtrl', function($scope, $http){
+
+    $scope.submitNewMeow = function(){
+      $http.post('/meows', {newMeow: $scope.newMeow}).then(function(){
+        getMeows();
+        $scope.newMeow = ' ';
+      })
+    }
+
+    $scope.removeMeow = function(meow){
+      $http.put('/meows/remove', {meow: meow}).then(function(){
+        getMeows();
+      })
+    };
+
+    function getMeows(){
+      $http.get('/meows').then(function(response){
+        $scope.meows = response.data;
+      });
+    }
+
+    getMeows();
+
+  });
+
+  </script>
+
+</head>
+<body ng-controller="MittensCtrl">
+  <h1 class="page-title">Mittens</h1>
+  <div class="row feed">
+    <div class="col-md-4">
+      <h4>Login</h4>
+      <br>
+      <input type="text" size="30" placeholder="Username">
+      <br><br>
+      <input type="password" size="30" placeholder="Password">
+    </div>
+    <div class="col-md-8">
+      <div class="new-meow">
+        <input type="text" class="form-control" ng-model="newMeow" placeholder="What do you have to meow today?">
+        <button class="btn" type="button" ng-click="submitNewMeow()">Submit</button>
+      </div>
+      <h3 ng-repeat="meow in meows">
+        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+        {{meow.text}}
+        <a href ng-click="removeMeow(meow)"><span class="glyphicon glyphicon-remove"></a>
+      </h3>
+    </div>
+  </div>
+</body>
+</html>
